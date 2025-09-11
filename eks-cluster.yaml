@@ -1,0 +1,41 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+metadata:
+  name: webapp
+  region: ap-northeast-1
+  version: "1.33"
+addonsConfig:
+  autoApplyPodIdentityAssociations: true
+addons:
+  - name: eks-pod-identity-agent
+  - name: vpc-cni
+  - name: kube-proxy
+  - name: coredns
+vpc:
+  id: vpc-098cc2ff533daa8df
+  subnets:
+    private:
+      ap-northeast-a:
+        id: subnet-0e2a98a3f23e9a323
+      ap-northeast-c:
+        id: subnet-06a71743c1a949f97
+    public:
+      ap-northeast-a: 
+        id: subnet-0fe8e72ee7cdc2dd2
+      ap-northeast-c:
+        id: subnet-07992367b7568fbf3
+managedNodeGroups:
+  - name: workers
+    instanceType: t3.medium
+    desiredCapacity: 2
+    securityGroups:
+      attachIDs: ["sg-05b1170d8f73363c5"]
+iam:
+  withOIDC: true
+  serviceAccounts:
+    - metadata:
+        name: aws-load-balancer-controller
+        namespace: kube-system
+      attachPolicyARNs:
+        - "arn:aws:iam::783764615631:policy/AWSLoadBalancerControllerIAMPolicy"
+      roleName: "aws-load-balancer-controller-role"
